@@ -389,7 +389,7 @@ Class clsMSExcel
 	' --------------------------------------------------
 	' Export the code of a workbook (can be an addin)
 	' --------------------------------------------------
-	Public Sub ExportVBACode()
+	Public Sub ExportVBACode(exportFolder)
 
 		Dim objFSO, objShell
 		Dim wb, project
@@ -409,7 +409,11 @@ Class clsMSExcel
 		bReadOnly = True
 
 		' Get the parent folder i.e. the folder where the Excel file is stored
-		sFolder = cFiles.GetParentFolderName(sFileName)
+		If (exportFolder <> "") Then
+			sFolder = exportFolder
+		Else
+			sFolder = cFiles.GetParentFolderName(sFileName)
+		End If
 
 		' Get the export path
 		' When sFileName is f.i. c:\temp\workbook.xlsm, the export path will be
@@ -564,6 +568,7 @@ End sub
 
 Dim cMSExcel
 Dim sFileName
+Dim sExportFolder
 
 	' Get the first argument
 	If (wScript.Arguments.Count = 0) Then
@@ -573,6 +578,12 @@ Dim sFileName
 	Else
 		' Get the file name
 		sFileName = Trim(Wscript.Arguments.Item(0))
+		If Wscript.Arguments.Length >= 2 Then
+			sExportFolder = Trim(Wscript.Arguments.Item(1))
+		Else
+			sExportFolder = ""
+		End If
+		
 
 		Set cMSExcel = New clsMSExcel
 
@@ -580,7 +591,7 @@ Dim sFileName
 
 		cMSExcel.FileName = sFileName
 
-		Call cMSExcel.ExportVBACode()
+		Call cMSExcel.ExportVBACode(sExportFolder)
 
 		' Job done, we can quit Excel
 		Call cMSExcel.Quit()
